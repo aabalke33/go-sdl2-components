@@ -1,4 +1,4 @@
-package main
+package components
 
 import (
 	"github.com/veandco/go-sdl2/sdl"
@@ -10,7 +10,8 @@ type TexturedBox struct {
 	renderer   *sdl.Renderer
 	texture    *sdl.Texture
 	pixels     *[]byte
-	parent     *Component
+	parent     Component
+    children []*Component
 	w, x, y, z int32
     tH, tW     int32
 	h          *int32
@@ -25,7 +26,7 @@ func NewTexturedBox(renderer *sdl.Renderer, parent Component, ratio float64, h *
 
 	b := TexturedBox{
         renderer: renderer,
-		parent:  &parent,
+		parent:  parent,
 		texture: texture,
 		pixels:  &pixels,
 		ratio:   ratio,
@@ -95,10 +96,31 @@ func (b *TexturedBox) View(renderer *sdl.Renderer) {
     b.renderer.Copy(b.texture, nil, &rect)
 }
 
+func (b *TexturedBox) Add(c Component) {
+	b.children = append(b.children, &c)
+}
+
+
 func (b *TexturedBox) GetZ() int32 {
 	return b.z
 }
 
 func (b *TexturedBox) Resize() {
 	b.w = int32(math.Floor(float64(*b.h) * b.ratio))
+}
+
+func (b *TexturedBox) isActive() bool {
+    return b.Active
+}
+
+func (b *TexturedBox) GetChildren() []*Component {
+    return b.children
+}
+
+func (b *TexturedBox) GetParent() *Component {
+    return &b.parent
+}
+
+func (b *TexturedBox) GetSize() (int32, int32) {
+    return *b.h, b.w
 }

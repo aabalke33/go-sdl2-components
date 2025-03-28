@@ -14,3 +14,6 @@ Need to Add children to add components.
 
 Uses Z value for render priority.
 
+# Usage
+
+Scene is the master component where all other components are placed.

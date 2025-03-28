@@ -1,17 +1,12 @@
-package main
+package components
 
 import "github.com/veandco/go-sdl2/sdl"
 
-type Component interface {
-	Update(dt float64, event sdl.Event)
-	View(renderer *sdl.Renderer)
-	GetZ() int32
-	Resize()
-}
 
 type Scene struct {
 	Renderer   *sdl.Renderer
-	Components []Component
+	children   []*Component
+    parent     *Component
 	FPS        float64
 	Active     bool
 	W, H       int32
@@ -24,7 +19,7 @@ func NewScene(renderer *sdl.Renderer, FPS float64, w, h, MAX_Z int32, color sdl.
 }
 
 func (s *Scene) Add(c Component) {
-	s.Components = append(s.Components, c)
+	s.children = append(s.children, &c)
 }
 
 func (s *Scene) Update(dt float64, event sdl.Event) {
@@ -61,8 +56,8 @@ func (s *Scene) Update(dt float64, event sdl.Event) {
 }
 
 func (s *Scene) UpdateChildren(event sdl.Event) {
-	for _, c := range s.Components {
-		c.Update(1/s.FPS, event)
+	for _, c := range s.children {
+		(*c).Update(1/s.FPS, event)
 	}
 }
 
@@ -79,13 +74,14 @@ func (s *Scene) View(renderer *sdl.Renderer) {
 	countRendered := 0
 	var z int32 = 0
 	for z = range s.MAX_Z {
-		if len(s.Components) == countRendered {
+		if len(s.children) == countRendered {
 			return
 		}
 
-		for _, c := range s.Components {
-			if c.GetZ() == z {
-				c.View(renderer)
+		for _, c := range s.children {
+            cp := *c
+			if cp.GetZ() == z {
+				cp.View(renderer)
 			}
 		}
 	}
@@ -124,14 +120,32 @@ func (s *Scene) Resize() {
 	countRendered := 0
 	var z int32 = 0
 	for z = range s.MAX_Z {
-		if len(s.Components) == countRendered {
+
+		if len(s.children) == countRendered {
 			return
 		}
 
-		for _, c := range s.Components {
-			if c.GetZ() == z {
-				c.Resize()
+		for _, c := range s.children {
+            cp := *c
+			if cp.GetZ() == z {
+				cp.Resize()
 			}
 		}
 	}
+}
+
+func (s *Scene) isActive() bool {
+    return s.Active
+}
+
+func (s *Scene) GetChildren() []*Component {
+    return s.children
+}
+
+func (s *Scene) GetParent() *Component {
+    return s.parent
+}
+
+func (b *Scene) GetSize() (int32, int32) {
+    return b.H, b.W
 }
