@@ -7,15 +7,16 @@ import (
 type Component interface {
 	Update(dt float64, event sdl.Event)
 	View(renderer *sdl.Renderer)
-    Add(component Component)
+	Add(component Component)
 
 	Resize()
 
 	GetZ() int32
-    isActive() bool
+	IsActive() bool
 
-    GetChildren() []*Component
-    GetParent() *Component
+	GetChildren() []*Component
+    SetChildren([]*Component)
+	GetParent() *Component
 
-    GetSize() (h int32, w int32)
+	GetSize() (h int32, w int32)
 }

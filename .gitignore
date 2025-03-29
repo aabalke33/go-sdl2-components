@@ -1,2 +1,4 @@
 .git
 SDL2.dll
+SDL2_ttf.dll
+*.otf
